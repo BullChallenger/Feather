@@ -1,0 +1,3 @@
+[db]
+database = "mysql"
+url = "root:dltkdgksskfkdmldoffltm123#@tcp(dev-in-wonderland.pro:27461)/feather?multiStatements=true&parseTime=true"
