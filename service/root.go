@@ -46,23 +46,30 @@ func (service *Service) CreateGithubUser(userId int64, nickname string, email st
 }
 
 // CreateGithubRepository GitHub 리포지토리를 생성하고 생성된 리포지토리에 Jenkins Job을 설정합니다.
-func (service *Service) CreateGithubRepository(githubRepoDTO *types.CreateGithubRepositoryReq) error {
-	repo, err := service.createRepositoryInGithub(githubRepoDTO)
+func (service *Service) CreateGithubRepository(req *types.CreateGithubRepositoryReq) error {
+	repo, err := service.createRepositoryInGithub(req)
 	if err != nil {
 		log.Println("깃허브 리포지토리를 생성하는데 실패했습니다. : ", "err", err.Error())
 		return err
 	}
 
-	err = service.repository.CreateGithubRepository(githubRepoDTO.GithubUserId, githubRepoDTO.Name, githubRepoDTO.Description, githubRepoDTO.Private)
+	err = service.repository.CreateGithubRepository(req.GithubUserId, req.Name, req.Description, req.Private)
 	if err != nil {
 		log.Println("깃허브 리포지토리에 대한 정보를 저장하는데 실패했습니다. : ", "err", err.Error())
 		return err
 	}
 
-	err = service.createJenkinsJob(repo.Name, repo.Description, repo.HtmlUrl)
+	jenkinsUser, err := service.repository.JenkinsUserByUserId(req.UserId)
+	if err != nil {
+		log.Println("젠킨스 사용자 정보를 불러오는데 실패했습니다. : ", "err", err.Error())
+		return err
+	}
+
+	err = service.createJenkinsJob(repo.Name, repo.Description, repo.HtmlUrl, jenkinsUser.Nickname, jenkinsUser.Token)
 	if err != nil {
 		log.Println("젠킨스 잡을 생성하는데 실패했습니다. : ", "err", err.Error())
 		return err
 	}
+
 	return nil
 }

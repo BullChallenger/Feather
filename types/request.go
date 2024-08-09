@@ -24,6 +24,7 @@ type CreateJenkinsUserReq struct {
 }
 
 type CreateGithubRepositoryReq struct {
+	UserId       int64  `json:"user_id" binding:"required"`
 	GithubUserId int64  `json:"github_user_id" binding:"required"`
 	Name         string `json:"name" binding:"required"`
 	Description  string `json:"description"`
